@@ -1,12 +1,9 @@
 // Initialize Phaser, and creates a 400x490px game
-var game = new Phaser.Game(960 , 640, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(960 , 640, Phaser.AUTO, '');
 
 var platforms;
-
 var cursors;
-var road, road2;
-var background_speed = -32;
-
+var road;
 //var hazards;
 
 
@@ -16,7 +13,7 @@ var mainState = {
     // Function called first to load all the assets
     preload: function() { 
         // Change the background color of the game
-        //game.stage.backgroundColor = '#71c5cf';
+        game.stage.backgroundColor = '#71c5cf';
 
         // Load the bike sprite
         game.load.image('bike', 'assets/bike.png');  
@@ -25,8 +22,7 @@ var mainState = {
         game.load.image('hazard', 'assets/hazard.png');  
 
         //Load the road sprite
-        game.load.image('road_img', 'assets/road.png');
-
+        game.load.image('road', 'assets/road.png');
 
 
         //Load the pothole sprite
@@ -39,25 +35,15 @@ var mainState = {
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         cursors = game.input.keyboard.createCursorKeys();
-        
-        road = game.add.sprite(0, game.world.height-96, 'road_img');
-        game.physics.enable(road, Phaser.Physics.ARCADE);
-        road.body.velocity.x = background_speed;
-        
-        
+        road = game.add.tileSprite(0, game.world.height-96, 1024, 96, 'road');
 
-        /*
-        road2 = game.add.sprite(game.world.width, game.world.height-96, 'road_img');
-        game.physics.enable(road2, Phaser.Physics.ARCADE);
-        road2.body.velocity.x =0;
-        */
 
         //create the platforms group
         platforms = game.add.group();
         platforms.enableBody = true;
 
         road = platforms.create(0, game.world.height-64);
-        //road.body.immovable = true;
+        road.body.immovable = true;
 
 
         // Display the bike on the screen
@@ -86,15 +72,10 @@ var mainState = {
         //this.labelScore = this.game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });  
     },
 
-    
-
     // This function is called 60 times per second
     update: function() {
-        this.updateBackgrounds();
         //  Scroll the background
-        //road.autoScroll(32, 0);
-
-        
+        road.autoScroll(32, 0);
 
         // If the bike is out of the world (too high or too low), call the 'restartGame' function
         if (this.bike.inWorld == false){
@@ -118,9 +99,9 @@ var mainState = {
             //player.animations.play('right');
             }
             //  Allow the player to jump if they are touching the ground.
-            if (cursors.up.isDown && this.bike.body.position.y>400)
+            if (cursors.up.isDown)
             {
-                this.bike.body.velocity.y = -200;
+                this.bike.body.velocity.y = -150;
         
             }
 
@@ -130,24 +111,10 @@ var mainState = {
     }
     },
 
-    updateBackgrounds: function(){
-
-        //console.log("Road position: " + road.body.position.x);
-        //console.log("road.position.x "+ road.position.x);
-        if (road.body.position.x < 0){
-           road.body.position.x = 0;
-
-        }
-        
-        
-    },
-
     // Make the bike jump 
     jump: function() {
-        if(this.bike.body.position.y>400){
         // Add a vertical velocity to the bike
         this.bike.body.velocity.y = -300;
-    }
     },
 
     // Restart the game
