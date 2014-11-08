@@ -2,6 +2,7 @@
 var game = new Phaser.Game(400, 490, Phaser.AUTO, 'gameDiv');
 var platforms;
 var cursors;
+var road;
 //var hazards;
 
 
@@ -22,6 +23,7 @@ var mainState = {
         //Load the road sprite
         game.load.image('road', 'assets/road.png');
 
+
         //Load the pothole sprite
         //game.load.image('pothole', 'assets/pothole.png')
     },
@@ -32,12 +34,13 @@ var mainState = {
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         cursors = game.input.keyboard.createCursorKeys();
+        road = game.add.tileSprite(0, game.world.height-96, 1128, 96, 'road');
 
         //create the platforms group
         platforms = game.add.group();
         platforms.enableBody = true;
 
-        var road = platforms.create(0, game.world.height-64, 'road');
+        road = platforms.create(0, game.world.height-64);
         road.body.immovable = true;
 
 
@@ -69,6 +72,8 @@ var mainState = {
 
     // This function is called 60 times per second
     update: function() {
+        //  Scroll the background
+        //road.autoScroll(2, 0);
         // If the bike is out of the world (too high or too low), call the 'restartGame' function
         if (this.bike.inWorld == false){
             this.restartGame(); 
