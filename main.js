@@ -9,11 +9,17 @@ var mainState = {
         // Change the background color of the game
         game.stage.backgroundColor = '#71c5cf';
 
-        // Load the bird sprite
-        game.load.image('bird', 'assets/bird.png');  
+        // Load the bike sprite
+        game.load.image('bike', 'assets/bike.png');  
 
-        // Load the pipe sprite
-        game.load.image('pipe', 'assets/pipe.png');      
+        // Load the hazard sprite
+        game.load.image('hazard', 'assets/hazard.png');  
+
+        //Load the road sprite
+        game.load.image('road', 'assets/road.png');
+
+        //Load the pothole sprite
+        //game.load.image('pothole', 'assets/pothole.png')
     },
 
     // Fuction called after 'preload' to setup the game 
@@ -21,21 +27,25 @@ var mainState = {
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
-        // Display the bird on the screen
-        this.bird = this.game.add.sprite(100, 245, 'bird');
+        // Display the bike on the screen
+        this.bike = this.game.add.sprite(100, 245, 'bike');
         
-        // Add gravity to the bird to make it fall
-        game.physics.arcade.enable(this.bird);
-        this.bird.body.gravity.y = 1000; 
+        // Add gravity to the bike to make it fall
+        game.physics.arcade.enable(this.bike);
+        this.bike.body.gravity.y = 250; 
+
+        //Add a floor
+        this.road.add.sprite(0, 600, 'road');
+        this.road.enableBody();
 
         // Call the 'jump' function when the spacekey is hit
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this); 
 
-        // Create a group of 20 pipes
-        this.pipes = game.add.group();
-        this.pipes.enableBody = true;
-        this.pipes.createMultiple(20, 'pipe');  
+        // Create a group of 20 hazards
+        this.hazards = game.add.group();
+        this.hazards.enableBody = true;
+        this.hazards.createMultiple(20, 'hazard');  
 
         // Timer that calls 'addRowOfPipes' ever 1.5 seconds
         this.timer = this.game.time.events.loop(1500, this.addRowOfPipes, this);           
@@ -47,18 +57,18 @@ var mainState = {
 
     // This function is called 60 times per second
     update: function() {
-        // If the bird is out of the world (too high or too low), call the 'restartGame' function
-        if (this.bird.inWorld == false)
+        // If the bike is out of the world (too high or too low), call the 'restartGame' function
+        if (this.bike.inWorld == false)
             this.restartGame(); 
 
-        // If the bird overlap any pipes, call 'restartGame'
-        game.physics.arcade.overlap(this.bird, this.pipes, this.restartGame, null, this);      
+        // If the bike overlap any hazards, call 'restartGame'
+        game.physics.arcade.overlap(this.bike, this.hazards, this.restartGame, null, this);      
     },
 
-    // Make the bird jump 
+    // Make the bike jump 
     jump: function() {
-        // Add a vertical velocity to the bird
-        this.bird.body.velocity.y = -350;
+        // Add a vertical velocity to the bike
+        this.bike.body.velocity.y = -350;
     },
 
     // Restart the game
@@ -67,23 +77,23 @@ var mainState = {
         game.state.start('main');
     },
 
-    // Add a pipe on the screen
+    // Add a hazard on the screen
     addOnePipe: function(x, y) {
-        // Get the first dead pipe of our group
-        var pipe = this.pipes.getFirstDead();
+        // Get the first dead hazard of our group
+        var hazard = this.hazards.getFirstDead();
 
-        // Set the new position of the pipe
-        pipe.reset(x, y);
+        // Set the new position of the hazard
+        hazard.reset(x, y);
 
-        // Add velocity to the pipe to make it move left
-        pipe.body.velocity.x = -200; 
+        // Add velocity to the hazard to make it move left
+        hazard.body.velocity.x = -200; 
                
-        // Kill the pipe when it's no longer visible 
-        pipe.checkWorldBounds = true;
-        pipe.outOfBoundsKill = true;
+        // Kill the hazard when it's no longer visible 
+        hazard.checkWorldBounds = true;
+        hazard.outOfBoundsKill = true;
     },
 
-    // Add a row of 6 pipes with a hole somewhere in the middle
+    // Add a row of 6 hazards with a hole somewhere in the middle
     addRowOfPipes: function() {
         var hole = Math.floor(Math.random()*5)+1;
         
