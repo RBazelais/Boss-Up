@@ -1,6 +1,10 @@
 // Initialize Phaser, and creates a 400x490px game
 var game = new Phaser.Game(400, 490, Phaser.AUTO, 'gameDiv');
 var platforms;
+var cursors;
+//var hazards;
+
+
 // Creates a new 'main' state that will contain the game
 var mainState = {
 
@@ -26,6 +30,8 @@ var mainState = {
     create: function() { 
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
+
+        cursors = game.input.keyboard.createCursorKeys();
 
         //create the platforms group
         platforms = game.add.group();
@@ -64,17 +70,43 @@ var mainState = {
     // This function is called 60 times per second
     update: function() {
         // If the bike is out of the world (too high or too low), call the 'restartGame' function
-        if (this.bike.inWorld == false)
+        if (this.bike.inWorld == false){
             this.restartGame(); 
+        }
+        
+        else{
+            this.bike.body.velocity.x = 0;
+            if (cursors.left.isDown)
+            {
+            //  Move to the left
+            this.bike.body.velocity.x = -150;
+ 
+            //player.animations.play('left');
+            }
+            else if (cursors.right.isDown)
+            {
+            //  Move to the right
+            this.bike.body.velocity.x = 150;
+ 
+            //player.animations.play('right');
+            }
+            //  Allow the player to jump if they are touching the ground.
+            if (cursors.up.isDown)
+            {
+                this.bike.body.velocity.y = -150;
+        
+            }
 
+    
         // If the bike overlap any hazards, call 'restartGame'
         game.physics.arcade.overlap(this.bike, this.hazards, this.restartGame, null, this);      
+    }
     },
 
     // Make the bike jump 
     jump: function() {
         // Add a vertical velocity to the bike
-        this.bike.body.velocity.y = -350;
+        this.bike.body.velocity.y = -300;
     },
 
     // Restart the game
@@ -84,7 +116,7 @@ var mainState = {
     },
 
     // Add a hazard on the screen
-    addOnePipe: function(x, y) {
+    addOneHazard: function(x, y) {
         // Get the first dead hazard of our group
         var hazard = this.hazards.getFirstDead();
 
@@ -105,7 +137,7 @@ var mainState = {
         
         for (var i = 0; i < 8; i++)
             if (i != hole && i != hole +1) 
-                this.addOnePipe(400, i*60+10);   
+                this.addOneHazard(400, i*60+10);   
     
         this.score += 1;
         this.labelScore.text = this.score;  
