@@ -1,6 +1,6 @@
 // Initialize Phaser, and creates a 400x490px game
 var game = new Phaser.Game(400, 490, Phaser.AUTO, 'gameDiv');
-
+var platforms;
 // Creates a new 'main' state that will contain the game
 var mainState = {
 
@@ -27,16 +27,22 @@ var mainState = {
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
+        //create the platforms group
+        platforms = game.add.group();
+        platforms.enableBody = true;
+
+        var road = platforms.create(0, game.world.height-64, 'road');
+        road.body.immovable = true;
+
+
         // Display the bike on the screen
         this.bike = this.game.add.sprite(100, 245, 'bike');
         
         // Add gravity to the bike to make it fall
         game.physics.arcade.enable(this.bike);
         this.bike.body.gravity.y = 250; 
+        this.bike.body.collideWorldBounds = true;
 
-        //Add a floor
-        this.road.add.sprite(0, 600, 'road');
-        this.road.enableBody();
 
         // Call the 'jump' function when the spacekey is hit
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
