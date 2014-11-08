@@ -5,8 +5,8 @@ var game = new Phaser.Game(640, 360, Phaser.AUTO, 'gameDiv');
 var platforms;
 
 var cursors;
-var road, road2;
-var background_speed = -32;
+var road;
+var background_speed = -2;
 
 //var hazards;
 
@@ -17,7 +17,7 @@ var mainState = {
     // Function called first to load all the assets
     preload: function() { 
         // Change the background color of the game
-        //game.stage.backgroundColor = '#71c5cf';
+        game.stage.backgroundColor = '#71c5cf';
 
         // Load the bike sprite
         game.load.image('bike', 'assets/bike.png');  
@@ -26,7 +26,7 @@ var mainState = {
         game.load.image('hazard', 'assets/hazard.png');  
 
         //Load the road sprite
-        game.load.image('road_img', 'assets/road.png');
+        game.load.image('background', 'assets/ghost_bike_street_level.png');
 
 
 
@@ -41,22 +41,10 @@ var mainState = {
 
         cursors = game.input.keyboard.createCursorKeys();
         
-        road = game.add.sprite(0, game.world.height-96, 'road_img');
-        game.physics.enable(road, Phaser.Physics.ARCADE);
-        road.body.velocity.x = background_speed;
+        //add a tile sprite to control the background
+        road = game.add.tileSprite(0, 0, 640, 369, 'background');
 
-        road = game.add.tileSprite(0, game.world.height-96, 1128, 96, 'road');
-
-
-        //create the platforms group
-        platforms = game.add.group();
-        platforms.enableBody = true;
-
-        road = platforms.create(0, game.world.height-64);
-        //road.body.immovable = true;
-
-
-        // Display the bike on the screen
+         // Display the bike on the screen
         this.bike = this.game.add.sprite(100, 245, 'bike');
         
         // Add gravity to the bike to make it fall
@@ -86,8 +74,9 @@ var mainState = {
 
     // This function is called 60 times per second
     update: function() {
-        this.updateBackgrounds();
+        
         //  Scroll the background
+        road.tilePosition.x += background_speed;
 
         // If the bike is out of the world (too high or too low), call the 'restartGame' function
         if (this.bike.inWorld == false){
@@ -127,10 +116,11 @@ var mainState = {
 
         //console.log("Road position: " + road.body.position.x);
         //console.log("road.position.x "+ road.position.x);
+        /*
         if (road.body.position.x < 0){
            road.body.position.x = 0;
 
-        }
+        }*/
         
         
     },
