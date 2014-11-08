@@ -1,5 +1,6 @@
 // Initialize Phaser, and creates a 400x490px game
-var game = new Phaser.Game(400, 490, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(960 , 640, Phaser.AUTO, '');
+
 var platforms;
 var cursors;
 var road;
@@ -34,7 +35,8 @@ var mainState = {
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         cursors = game.input.keyboard.createCursorKeys();
-        road = game.add.tileSprite(0, game.world.height-96, 1128, 96, 'road');
+        road = game.add.tileSprite(0, game.world.height-96, 1024, 96, 'road');
+
 
         //create the platforms group
         platforms = game.add.group();
@@ -73,7 +75,8 @@ var mainState = {
     // This function is called 60 times per second
     update: function() {
         //  Scroll the background
-        //road.autoScroll(2, 0);
+        road.autoScroll(32, 0);
+
         // If the bike is out of the world (too high or too low), call the 'restartGame' function
         if (this.bike.inWorld == false){
             this.restartGame(); 
