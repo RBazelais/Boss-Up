@@ -1,5 +1,6 @@
 // Initialize Phaser, and creates a 400x490px game
-var game = new Phaser.Game(960 , 640, Phaser.AUTO, 'gameDiv');
+
+var game = new Phaser.Game(640, 360, Phaser.AUTO, 'gameDiv');
 
 var platforms;
 
@@ -43,14 +44,9 @@ var mainState = {
         road = game.add.sprite(0, game.world.height-96, 'road_img');
         game.physics.enable(road, Phaser.Physics.ARCADE);
         road.body.velocity.x = background_speed;
-        
-        
 
-        /*
-        road2 = game.add.sprite(game.world.width, game.world.height-96, 'road_img');
-        game.physics.enable(road2, Phaser.Physics.ARCADE);
-        road2.body.velocity.x =0;
-        */
+        road = game.add.tileSprite(0, game.world.height-96, 1128, 96, 'road');
+
 
         //create the platforms group
         platforms = game.add.group();
@@ -92,9 +88,6 @@ var mainState = {
     update: function() {
         this.updateBackgrounds();
         //  Scroll the background
-        //road.autoScroll(32, 0);
-
-        
 
         // If the bike is out of the world (too high or too low), call the 'restartGame' function
         if (this.bike.inWorld == false){
