@@ -55,16 +55,16 @@ var mainState = {
         spaceKey.onDown.add(this.jump, this); 
 
         // Create a group of 20 hazards
-        this.hazards = game.add.group();
-        this.hazards.enableBody = true;
-        this.hazards.createMultiple(20, 'hazard');  
+        //this.hazards = game.add.group();
+        //this.hazards.enableBody = true;
+        //this.hazards.createMultiple(20, 'hazard');  
 
         // Timer that calls 'addRowOfPipes' ever 1.5 seconds
-        this.timer = this.game.time.events.loop(1500, this.addRowOfPipes, this);           
+        //this.timer = this.game.time.events.loop(1500, this.addRowOfPipes, this);           
 
         // Add a score label on the top left of the screen
-        this.score = 0;
-        this.labelScore = this.game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });  
+        //this.score = 0;
+        //this.labelScore = this.game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });  
     },
 
     // This function is called 60 times per second
@@ -114,7 +114,7 @@ var mainState = {
         // Start the 'main' state, which restarts the game
         game.state.start('main');
     },
-
+/*
     // Add a hazard on the screen
     addOneHazard: function(x, y) {
         // Get the first dead hazard of our group
@@ -131,6 +131,8 @@ var mainState = {
         hazard.outOfBoundsKill = true;
     },
 
+
+
     // Add a row of 6 hazards with a hole somewhere in the middle
     addRowOfPipes: function() {
         var hole = Math.floor(Math.random()*5)+1;
@@ -142,7 +144,9 @@ var mainState = {
         this.score += 1;
         this.labelScore.text = this.score;  
     },
+*/
 };
+
 
 // Add and start the 'main' state to start the game
 game.state.add('main', mainState);  
