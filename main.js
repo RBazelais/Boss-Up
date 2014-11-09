@@ -1,4 +1,4 @@
-// Initialize Phaser, and creates a 400x490px game
+// Initialize Phaser, and creates a 640x360px game
 
 var game = new Phaser.Game(640, 360, Phaser.AUTO, 'gameDiv');
 
