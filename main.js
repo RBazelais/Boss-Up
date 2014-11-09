@@ -255,7 +255,7 @@ var mainState = {
     spawnHazards: function(){
         game.physics.enable(hazards, Phaser.Physics.ARCADE);
         
-        for(var i = 0; i < 3; i++){
+        for(var i = 0; i < 2; i++){
 
         var hazard = hazards.create(game.world.width, Math.random()*game.world.height, 'pickle_juice');
         game.physics.enable(hazards, Phaser.Physics.ARCADE);
