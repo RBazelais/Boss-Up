@@ -9,10 +9,12 @@ var road;
 var background_speed = 2;
 var bike_y_speed = 100;
 var bike_x_speed = 100;
-var TopTrack = 180;
+var TopTrack = 220;
 var BottomTrack = 360;
 var onRoad = true;
-
+var upramp;
+var ramp_speed = -80;
+var downramp;
 var highline;
 
 //var hazards;
@@ -36,13 +38,13 @@ var mainState = {
         game.load.image('background', 'assets/ghost_bike_street_level.png');
 
         //load the up ramp
-        //game.load.image('upRamp', 'assest/upRamp.png');
+        game.load.image('upRamp', 'assets/up_ramp.png');
 
         //load the down ramp
-        //game.load.image('downRamp', 'assets/downRamp.png');
+        game.load.image('downRamp', 'assets/down_ramp.png');
 
         //load the highline track
-        game.load.image('highline', 'assets/highline.png');        
+        game.load.image('highline', 'assets/hi_line.png');        
         
     },
 
@@ -55,11 +57,24 @@ var mainState = {
         
         //add a tile sprite to control the background
         road = game.add.tileSprite(0, 0, 640, 360, 'background');
-        highline = game.add.tileSprite(0, 0, 640, 180, 'highline');
-         
-         // Display the bike on the screen
-        this.bike = this.game.add.sprite(100, (TopTrack+TopTrack/2), 'bike');
+        highline = game.add.tileSprite(0, 0, 640, 240, 'highline');
         
+
+        //upramp creation
+
+        upramp = game.add.sprite(game.world.width, 140, 'upRamp');
+        game.physics.enable(upramp, Phaser.Physics.ARCADE);
+
+        //downramp creation
+        downramp = game.add.sprite(game.world.width, 160, 'downRamp');
+        game.physics.enable(downramp, Phaser.Physics.ARCADE);
+
+
+        //downramp creation 
+         // Display the bike on the screen
+        this.bike = this.game.add.sprite(100, TopTrack, 'bike');
+        
+
 
 
         // Add gravity to the bike to make it fall
@@ -73,8 +88,9 @@ var mainState = {
         //this.hazards.enableBody = true;
         //this.hazards.createMultiple(20, 'hazard');  
 
+        this.addRamps();
         // Timer that calls 'addRowOfPipes' ever 1.5 seconds
-        //this.timer = this.game.time.events.loop(1500, this.addRowOfPipes, this);           
+        this.timer = this.game.time.events.loop(12000, this.addRamps, this);           
 
         // Add a score label on the top left of the screen
         //this.score = 0;
@@ -88,10 +104,11 @@ var mainState = {
 
         //console.log("Player x y" + this.bike.body.position.x + " " + this.bike.body.position.y);
 
-        //Check which track the player is on and update parameters accordingly
-        this.updateTracks();
+        
         //Move the bike with the cursors
         this.moveBike();
+
+        
         
         
         //  Scroll the background
@@ -102,20 +119,33 @@ var mainState = {
         //game.physics.arcade.overlap(this.bike, this.hazards, hazardCollisionHandler, null, this);      
         
         // If the bike overlap any hazards, call collisionHandler
-        //game.physics.arcade.overlap(this.bike, this.ramp, rampCollisionHandler, null, this);      
-    
+        if(onRoad){
+            game.physics.arcade.overlap(this.bike, upramp, this.rampCollisionHandler, null, this);      
+        }   
+        else{
+            game.physics.arcade.overlap(this.bike, downramp, this.rampCollisionHandler, null, this);
+        }
     },
 
     //Set the boundaries for whatever track the player is on
     updateTracks: function(){
         if(onRoad){
-            TopTrack = 200;
+            TopTrack = 220;
             BottomTrack = 280;
         }
         else{
-            TopTrack = 100;
-            BottomTrack = 200;
+            TopTrack = 60;
+            BottomTrack = 120;
         }
+    },
+
+    //adds up and down ramps as time passes
+    addRamps: function(){
+        upramp.position.x = game.world.width;
+        upramp.body.velocity.x = ramp_speed;
+
+        downramp.position.x=game.world.width+360;
+        downramp.body.velocity.x= ramp_speed;
     },
 
 
@@ -175,6 +205,10 @@ var mainState = {
     },
 
     rampCollisionHandler: function(){
+        onRoad = !onRoad;
+        this.updateTracks();
+        this.bike.body.position.y = (BottomTrack);
+        this.bike.body.position.x += 100;
         
 
     },
