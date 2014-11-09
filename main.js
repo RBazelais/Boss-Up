@@ -60,9 +60,6 @@ var mainState = {
     // Function called first to load all the assets
     preload: function() { 
        
-        //load sprite sheet
-        game.load.spritesheet('hazardsprites','assets/hazardsprites.png', 60, 60);
-
         // Load the bike sprite
         game.load.image('bike', 'assets/images/ghost_bike.png');  
 
@@ -298,12 +295,15 @@ var mainState = {
         hitPointsText.visible = false;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 
 =======
 game.time.events.stop();
 >>>>>>> origin/master
+=======
+>>>>>>> parent of 8ed1ab9... Fixed Sprite Order
         
       },
     //Spawn Ramps
