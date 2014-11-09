@@ -3,20 +3,21 @@
 var game = new Phaser.Game(640, 360, Phaser.AUTO, 'gameDiv');
 
 var ramps;
-
+var hazard;
 var cursors;
-var road;
-var background_speed = 2;
+var background;
+var background_speed = 1;
 var bike_y_speed = 100;
 var bike_x_speed = 100;
-var TopTrack = 220;
-var BottomTrack = 360;
+var bike_x_max = 120;
+var TopTrack = 210;
+var BottomTrack = 330;
 var onRoad = true;
 var upramp;
-var ramp_speed = -80;
+var ramp_speed = -200;
 var downramp;
-var highline;
-
+var fx;
+var music, bikejump;
 //var hazards;
 
 
@@ -25,27 +26,28 @@ var mainState = {
 
     // Function called first to load all the assets
     preload: function() { 
-        // Change the background color of the game
-        //game.stage.backgroundColor = '#71c5cf';
-
+       
         // Load the bike sprite
-        game.load.image('bike', 'assets/bike.png');  
+        game.load.image('bike', 'assets/images/ghost_bike.png');  
 
         // Load the hazard sprites
-        //game.load.image('hazard', 'assets/hazard.png');  
+        game.load.image('hazard', 'assets/images/pickle_juice.png');
 
         //Load the road sprite
-        game.load.image('background', 'assets/ghost_bike_street_level.png');
+        game.load.image('background', 'assets/images/background.png');
 
         //load the up ramp
-        game.load.image('upRamp', 'assets/up_ramp.png');
+        game.load.image('upRamp', 'assets/images/up_ramp.png');
 
         //load the down ramp
-        game.load.image('downRamp', 'assets/down_ramp.png');
+        game.load.image('downRamp', 'assets/images/down_ramp.png');
+       
 
-        //load the highline track
-        game.load.image('highline', 'assets/hi_line.png');        
-        
+        //load background fx track
+        game.load.audio('bikewind', 'assets/audio/BIKE_RideWind_Loop.ogg');
+
+        //load bike Jump
+        game.load.audio('bikejump', 'assets/audio/BIKE_Jump.ogg');
     },
 
     // Fuction called after 'preload' to setup the game 
@@ -56,41 +58,53 @@ var mainState = {
         cursors = game.input.keyboard.createCursorKeys();
         
         //add a tile sprite to control the background
-        road = game.add.tileSprite(0, 0, 640, 360, 'background');
-        highline = game.add.tileSprite(0, 0, 640, 240, 'highline');
-        
+        background = game.add.tileSprite(0, 0, 640, 360, 'background');
+              
 
         //upramp creation
 
-        upramp = game.add.sprite(game.world.width, 140, 'upRamp');
+        upramp = game.add.sprite(game.world.width, 135, 'upRamp');
         game.physics.enable(upramp, Phaser.Physics.ARCADE);
 
         //downramp creation
-        downramp = game.add.sprite(game.world.width, 160, 'downRamp');
+        downramp = game.add.sprite(game.world.width, 135, 'downRamp');
         game.physics.enable(downramp, Phaser.Physics.ARCADE);
 
 
         //downramp creation 
          // Display the bike on the screen
-        this.bike = this.game.add.sprite(100, TopTrack, 'bike');
+        this.bike = this.game.add.sprite(0, TopTrack, 'bike');
         
 
+        //add backgground noise
+        bikewind = game.add.audio('bikewind');
+        bikewind.play();
+
+        //add bikejump noise
+        bikejump = game.add.audio('bikejump');
 
 
-        // Add gravity to the bike to make it fall
+
+        // Add world bounds collider
         game.physics.arcade.enable(this.bike);
         this.bike.body.collideWorldBounds = true;
 
 
-        
-        // Create a group of 20 hazards
-        //this.hazards = game.add.group();
-        //this.hazards.enableBody = true;
-        //this.hazards.createMultiple(20, 'hazard');  
+        /*
+        //Create a group of 20 hazards
+        this.hazards = game.add.group();
+        this.hazards.enableBody = true;
+        this.hazards.createMultiple(20, 'hazard');  
+*/
 
+        hazard = game.add.sprite(this.game.world.width, 280, 'hazard');
+        game.physics.enable(hazard, Phaser.Physics.ARCADE);
+        this.releaseHazard();
         this.addRamps();
         // Timer that calls 'addRowOfPipes' ever 1.5 seconds
-        this.timer = this.game.time.events.loop(12000, this.addRamps, this);           
+        this.timer = this.game.time.events.loop(15000, this.addRamps, this);           
+        this.timer = this.game.time.events.loop(1000, this.increaseSpeed, this);
+        this.timer = this.game.time.events.loop(1000, this.releaseHazard, this);
 
         // Add a score label on the top left of the screen
         //this.score = 0;
@@ -112,30 +126,36 @@ var mainState = {
         
         
         //  Scroll the background
-        road.tilePosition.x -= background_speed;
-        highline.tilePosition.x -= background_speed;
+        background.tilePosition.x -= background_speed;
+        
+        
     
         // If the bike overlap any hazards, call collisionHandler
         //game.physics.arcade.overlap(this.bike, this.hazards, hazardCollisionHandler, null, this);      
         
         // If the bike overlap any hazards, call collisionHandler
         if(onRoad){
-            game.physics.arcade.overlap(this.bike, upramp, this.rampCollisionHandler, null, this);      
+            game.physics.arcade.overlap(this.bike, upramp, this.rampCollisionHandler, null, this);
+            game.physics.arcade.overlap(this.bike, downramp, this.hazardCollisionHandler, null, this);
         }   
         else{
             game.physics.arcade.overlap(this.bike, downramp, this.rampCollisionHandler, null, this);
+        
         }
+
+         game.physics.arcade.overlap(this.bike, hazard, this.hazardCollisionHandler, null, this);
+        
     },
 
     //Set the boundaries for whatever track the player is on
     updateTracks: function(){
         if(onRoad){
-            TopTrack = 220;
-            BottomTrack = 280;
+            TopTrack = 210;
+            BottomTrack = 330;
         }
         else{
             TopTrack = 60;
-            BottomTrack = 120;
+            BottomTrack = 105;
         }
     },
 
@@ -147,6 +167,19 @@ var mainState = {
         downramp.position.x=game.world.width+360;
         downramp.body.velocity.x= ramp_speed;
     },
+
+    increaseSpeed: function(){
+        background_speed++;
+        //fast_music.play();
+    },
+
+    decreaseSpeed: function(){
+        if(background_speed>1){
+        background_speed--;
+        }       
+        //calm_music.play();
+    },
+
 
 
     //Moves the bike in response to the arrow keys
@@ -162,7 +195,7 @@ var mainState = {
  
             //player.animations.play('left');
             }
-            if (cursors.right.isDown)
+            if (cursors.right.isDown && this.bike.body.position.x < bike_x_max)
             {
             //  Move to the right
             this.bike.body.velocity.x = bike_x_speed;
@@ -196,29 +229,36 @@ var mainState = {
     //CollisionHandler
 
     hazardCollisionHandler: function() {
-
-        //add code to BOSS UP! bike to bottom of highline
-
-        //add code to BOSS Down bike to road
-
-        //add code to change bool from onRoad to false when bike collides with highline sprite
+        background_speed = 1;
+        this.bike.body.velocity.x = ramp_speed;
+        this.releaseHazard();
     },
 
     rampCollisionHandler: function(){
         onRoad = !onRoad;
         this.updateTracks();
-        this.bike.body.position.y = (BottomTrack);
-        this.bike.body.position.x += 100;
+        var exitY;
+        if(onRoad){
+            exitY = TopTrack;
+        }
+        else{
+            exitY = BottomTrack;
+            this.decreaseSpeed();
+        }
+
+        this.bike.body.position.y = exitY;
+        this.bike.body.position.x += 180;
+        bikejump.play();
         
 
     },
     
-/*
+    /*
     // Add a hazard on the screen
     addOneHazard: function(x, y) {
         // Get the first dead hazard of our group
-        var hazard = this.hazards.getFirstDead();
-
+        hazard = game.add.sprite('hazard');
+        game.physics.enable(hazard, Phaser.Physics.ARCADE);
         // Set the new position of the hazard
         hazard.reset(x, y);
 
@@ -229,21 +269,22 @@ var mainState = {
         hazard.checkWorldBounds = true;
         hazard.outOfBoundsKill = true;
     },
+    */
 
+    releaseHazard: function(){
+        var hazardY = 280;
+         // Set the new position of the hazard
 
+         console.log("Got to release hazard")
+        hazard.body.position.x = this.game.world.width;
+        hazard.body.position.y = hazardY;
+        // Add velocity to the hazard to make it move left
+        hazard.body.velocity.x = -200; 
 
-    // Add a row of 6 hazards with a hole somewhere in the middle
-    addRowOfPipes: function() {
-        var hole = Math.floor(Math.random()*5)+1;
         
-        for (var i = 0; i < 8; i++)
-            if (i != hole && i != hole +1) 
-                this.addOneHazard(400, i*60+10);   
-    
-        this.score += 1;
-        this.labelScore.text = this.score;  
     },
-*/
+
+
 };
 
 
