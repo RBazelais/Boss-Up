@@ -66,6 +66,8 @@ var mainState = {
         // Load the hazard sprites
         game.load.image('pickle_juice', 'assets/images/pickle_juice.png');
 
+        game.load.spritesheet('hazardNames', 'assets/images/hazard_sprites.png', 60, 60);
+
         //Load the road sprite
         game.load.image('background', 'assets/images/background.png');
 
@@ -255,12 +257,16 @@ var mainState = {
     spawnHazards: function(){
         game.physics.enable(hazards, Phaser.Physics.ARCADE);
         
-        for(var i = 0; i < 2; i++){
+        
 
-        var hazard = hazards.create(game.world.width, Math.random()*game.world.height, 'pickle_juice');
+        var hazard = hazards.create(game.world.width, Math.random()*game.world.height, 'hazardNames');
+        var tempFrame = Math.round(Math.random()*8);
+        hazard.animations.add('frame', [tempFrame]);
+        
+        hazard.animations.play('frame');
         game.physics.enable(hazards, Phaser.Physics.ARCADE);
         hazard.body.velocity.x = world_speed;
-        }
+        
 
     },
 
@@ -293,8 +299,6 @@ var mainState = {
         // Hide score and HP
         scoreText.visible = false;
         hitPointsText.visible = false;
-
-
         
       },
     //Spawn Ramps
