@@ -3,7 +3,7 @@
 var game = new Phaser.Game(640, 360, Phaser.AUTO, 'gameDiv');
 
 var ramps;
-var hazard;
+//var hazard;
 var cursors;
 var background1;
 var background2;
@@ -21,7 +21,10 @@ var upramp;
 var downramp;
 var fx;
 var music, bikejump;
+
 var hazards;
+var hazardNames;
+
 var gameStarted = false;
 var buffer = 30;
 var maxWorldSpeed = -250;
@@ -101,7 +104,7 @@ var mainState = {
     create: function() { 
 
         //Create array of hazard sprite names
-        var hazards = ["firehydrant", "raccoon", "pothole", "jogger", "grandma", "rock", "pedestrians", "bush", "head out of manhole", "mailbox"];
+        var hazardNames = ["firehydrant", "raccoon", "pothole", "jogger", "grandma", "rock", "pedestrians", "bush", "head out of manhole", "mailbox"];
 
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -119,22 +122,10 @@ var mainState = {
 
         //ramps
         ramps = game.add.group();
-            
-        //ramps.setAll('outOfBoundsKill', true);
-        //ramps.setAll('checkWorldBounds', true);
-
-
-        //upramp creation
-        /*
-        upramp = game.add.sprite(game.world.width, 135, 'upRamp');
-        game.physics.enable(upramp, Phaser.Physics.ARCADE);
-
-        //downramp creation
-        downramp = game.add.sprite(game.world.width, 135, 'downRamp');
-        game.physics.enable(downramp, Phaser.Physics.ARCADE);
-        */
-
-        //downramp creation 
+        
+        //hazards
+        hazards = game.add.group();    
+        
          // Display the bike on the screen
         this.bike = this.game.add.sprite(0, TopTrack, 'bike');
         
@@ -147,9 +138,7 @@ var mainState = {
 
         crash = game.add.audio('crash');
         crash.volume -= .5;
-        
         park = game.add.audio('park');
-        
         street = game.add.audio('street');
         
         bossUp = game.add.audio('bossUp');
@@ -166,8 +155,7 @@ var mainState = {
         this.bike.body.collideWorldBounds = true;
 
             
-        hazard = game.add.sprite(this.game.world.width, 280, 'pickle_juice');
-        game.physics.enable(hazard, Phaser.Physics.ARCADE);
+        
         
         //this.addRamps();
        // this.releaseHazard();
@@ -177,6 +165,7 @@ var mainState = {
 
        // game.time.events.loop(Phaser.Timer.SECOND, this.updateCounter(), this);
         game.time.events.loop(Math.random()*10000, this.spawnRamps, this); 
+        game.time.events.loop(Math.random()*10000, this.spawnHazards, this);
         
 
 
@@ -226,7 +215,7 @@ var mainState = {
         //}   
         
 
-         game.physics.arcade.overlap(this.bike, hazard, this.hazardCollisionHandler, null, this);
+         game.physics.arcade.overlap(this.bike, hazards, this.hazardCollisionHandler, null, this);
         
     },
 
@@ -246,6 +235,21 @@ var mainState = {
         }
     },
 */
+
+
+    spawnHazards: function(){
+        game.physics.enable(hazards, Phaser.Physics.ARCADE);
+        
+        for(var i = 0; i < 3; i++){
+
+        var hazard = hazards.create(game.world.width, Math.random()*game.world.height, 'pickle_juice');
+        game.physics.enable(hazards, Phaser.Physics.ARCADE);
+        hazard.body.velocity.x = world_speed;
+        }
+
+    },
+
+
     //Spawn Ramps
 
     spawnRamps: function(){
@@ -413,7 +417,11 @@ var mainState = {
     hazardCollisionHandler: function() {
         //background_speed = 1;
         //this.bike.body.velocity.x = world_speed;
-        this.releaseHazard();
+        //this.releaseHazard();
+        hitPoints--;
+        crash.play();
+        world_speed = 0;
+        var temp = setTimeout(function(){world_speed = street_speed},1000);
     },
 
     rampCollisionHandler: function(bike, ramp){
