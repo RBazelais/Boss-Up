@@ -31,7 +31,6 @@ var maxWorldSpeed = -250;
 var minWorldSpeed = -50;
 // add ramp variable as group and launch from side of screen
 var ramps;
-var hitPoints = 3;
 var ramp_height = 135;
 var gameTimer=0;
 var nextRamp = 0;
@@ -40,8 +39,8 @@ var nextRamp = 0;
 var crash, park, street, bossUp;
 
 // HP
-var hitPoints;
-var hitPointsString = 'HP: ';
+var hitPoints = 3;
+var hitPointsString = "HP: " + hitPoints;
 var hitPointsText;
 
 // score
@@ -50,6 +49,7 @@ var scoreString = 'Score: ';
 var scoreText;
 
 var introText;
+var introTextString = "";
 var gameStarted = false;
 
 
@@ -172,9 +172,13 @@ var mainState = {
 
         
         // Add a score label on the top left of the screen
-        this.score = 0;
-        this.labelScore = this.game.add.text(20, 20, scoreString, { font: "30px Arial", fill: "#ffffff" });
-        this.labelScore = this.game.add.text(20, 20, score, { font: "30px Arial", fill: "#ffffff" });  
+        score = 0;
+        scoreText = this.game.add.text(20, 20, scoreString, { font: "30px Arial", fill: "#ff0000" });
+        //this.labelScore = this.game.add.text(20, 20, score, { font: "30px Arial", fill: "#ffffff" });  
+
+        hitPointsText = this.game.add.text(500, 20, hitPointsString, {font: "30px Arial", fill: "#ff0000"});
+
+        introText = this.game.add.text(300, 180, introTextString, {font: "30px Arial", fill: "#ff0000"});
         
     },
 
@@ -188,7 +192,17 @@ var mainState = {
 
         //console.log("Player x y" + this.bike.body.position.x + " " + this.bike.body.position.y);
 
-        
+        if(hitPoints<1){
+            this.loseState();
+        }
+        score = gameTimer;
+        scoreString = "Score: " + score;
+
+        hitPointsString = "HP: " + hitPoints;
+
+        scoreText.setText(scoreString);
+        hitPointsText.setText(hitPointsString);
+
         //Move the bike with the cursors
         this.moveBike();
         
@@ -215,7 +229,7 @@ var mainState = {
         //}   
         
 
-         game.physics.arcade.overlap(this.bike, hazards, this.hazardCollisionHandler, null, this);
+         game.physics.arcade.collide(this.bike, hazards, this.hazardCollisionHandler);
         
     },
 
@@ -249,7 +263,24 @@ var mainState = {
 
     },
 
+    loseState: function() {
+        // Stop timer
+        game.time.events.stop();
 
+        // Game over text
+        introText.setText('Game Over!\nClick to try again.');
+        introText.visible = true;
+
+        //bike.destroy();
+        hazards.destroy();
+        ramps.destroy();
+        
+        // Hide score and HP
+        scoreText.visible = false;
+        hitPointsText.visible = false;
+
+        
+      },
     //Spawn Ramps
 
     spawnRamps: function(){
@@ -414,14 +445,20 @@ var mainState = {
 
     //CollisionHandler
 
-    hazardCollisionHandler: function() {
+    hazardCollisionHandler: function(bike, hazard) {
         //background_speed = 1;
         //this.bike.body.velocity.x = world_speed;
         //this.releaseHazard();
+        hazard.destroy();
         hitPoints--;
         crash.play();
         world_speed = 0;
+        if(onRoad){
         var temp = setTimeout(function(){world_speed = street_speed},1000);
+    }
+        else{
+            var temp = setTimeout(function(){world_speed = park_speed},1000);
+        }
     },
 
     rampCollisionHandler: function(bike, ramp){
