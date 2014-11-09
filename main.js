@@ -34,6 +34,18 @@ var nextRamp = 0;
 //Audio Files
 var crash, park, street, bossUp;
 
+// HP
+var hitPoints;
+var hitPointsString = 'HP: ';
+var hitPointsText;
+
+// score
+var score;
+var scoreString = 'Score: ';
+var scoreText;
+
+var introText;
+var gameStarted = false;
 
 
 
@@ -88,7 +100,7 @@ var mainState = {
 
         //Create array of hazard sprite names
         //NOT DONE YET CODE ME!!!!!
-        //hazards [] = ('pickle_juice', 'pickle_juice', 'pickle_juice');
+         var hazards = ["firehydrant", "raccoon", "pothole", "jogger", "grandma", "rock", "pedestrians", "bush", "head out of manhole", "mailbox"];
 
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
