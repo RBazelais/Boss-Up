@@ -7,13 +7,13 @@ var hazard;
 var cursors;
 var background1;
 var background2;
-var world_speed = -50;
+var world_speed = -100;
 var bike_y_speed = 150;
 var bike_x_speed = 100;
 var bike_x_max = 120;
-var TopTrack = 210;
-var BottomTrack = 330;
-var onRoad = true;
+var TopTrack = 60;
+var BottomTrack = 105;
+var onRoad = false;
 var upramp;
 //var ramp_speed = -200;
 var downramp;
@@ -26,7 +26,7 @@ var maxWorldSpeed = -250;
 var minWorldSpeed = -50;
 // add ramp variable as group and launch from side of screen
 var ramps;
-var hitpoints = 3;
+var hitPoints = 3;
 var ramp_height = 135;
 var gameTimer=0;
 var nextRamp = 0;
@@ -159,7 +159,7 @@ var mainState = {
         
         //Move the bike with the cursors
         this.moveBike();
-
+        
 
 
              
@@ -176,7 +176,13 @@ var mainState = {
         
         // If the bike overlap any hazards, call collisionHandler
         //if(onRoad){
-            game.physics.arcade.overlap(this.bike, ramps, this.rampCollisionHandler, null, this);
+
+        game.physics.arcade.collide(this.bike, ramps, this.rampCollisionHandler);
+        //game.physics.arcade.overlap(this.bike, ramps, this.ramp.CollisionHandler, null, this);
+        //game.physics.arcade.overlap(this.bike, ramps, this.rampCollisionHandler, null, this);
+
+
+         //}
          //game.physics.arcade.overlap(this.bike, downramp, this.hazardCollisionHandler, null, this);
         //}   
         
@@ -187,6 +193,7 @@ var mainState = {
 
     //Set the boundaries for whatever track the player is on
     updateTracks: function(){
+        console.log("Got to updateTracks");
         if(onRoad){
             TopTrack = 210;
             BottomTrack = 330;
@@ -258,7 +265,7 @@ var mainState = {
         ramps.forEach(function(ramp){
             ramp.body.velocity.x = world_speed;
             if(ramp.body.position.x+ramp.body.width <= 0){
-                //ramp.remove();
+                //ramps.destroy();
             }
          });
 
@@ -369,22 +376,44 @@ var mainState = {
         this.releaseHazard();
     },
 
-    rampCollisionHandler: function(){
-        onRoad = !onRoad;
-        this.updateTracks();
-        var exitY;
-        if(onRoad){
-            exitY = TopTrack;
-            this.increaseSpeed();
+    rampCollisionHandler: function(bike, ramp){
+        var exitY = 0;
+        if(onRoad && !ramp.isUpRamp){
+            hitPoints--;
+            //crash.play();
+            
+        }
+        else if(!onRoad && ramp.isUpRamp){
+            hitPoints--;
+            //crash.play();
+            
         }
         else{
-            exitY = BottomTrack;
-            this.decreaseSpeed();
-        }
 
-        this.bike.body.position.y = exitY;
-        this.bike.body.position.x =0;
-        bikejump.play();
+            onRoad = !onRoad;
+       
+            if(onRoad){
+                TopTrack = 210;
+                BottomTrack = 330;
+                world_speed = -200;
+                exitY = TopTrack;
+            }
+            else{
+                TopTrack = 60;
+                BottomTrack = 105;
+                world_speed = -50;
+                exitY= BottomTrack;
+            }
+
+        bike.body.position.y = exitY;
+        //this.bike.body.position.x = 0;
+        bikejump.play();    
+        }
+        
+        
+        console.log(" On road is " + onRoad +" Exit y:" + exitY);
+
+        ramp.destroy();
         
 
     },
