@@ -104,8 +104,8 @@ var mainState = {
     create: function() { 
 
         //Create array of hazard sprite names
-        var hazardNames = ["bush", "raccoon", "manhole","baracade", "mailbox", "fire hydrant", "taxi", "bus", "red car", "blue car", "black car", "truck", "jogger", "man", "woman", "grandma", "jogger", "grandma"];
-        
+        var hazardNames = ["firehydrant", "raccoon", "pothole", "jogger", "grandma", "rock", "pedestrians", "bush", "head out of manhole", "mailbox"];
+
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -280,7 +280,7 @@ var mainState = {
         
 
         // Game over text
-        introText.setText('Game Over!\nClick to try again.');
+        introText.setText('Game Over!');
         introText.visible = true;
 
         background1.body.velocity.x =0;
@@ -543,7 +543,24 @@ game.time.events.stop();
 
     },
     
-    
+    /*
+    // Add a hazard on the screen
+    addOneHazard: function(x, y) {
+        // Get the first dead hazard of our group
+        hazard = game.add.sprite('hazard');
+        game.physics.enable(hazard, Phaser.Physics.ARCADE);
+        // Set the new position of the hazard
+        hazard.reset(x, y);
+
+        // Add velocity to the hazard to make it move left
+        hazard.body.velocity.x = -200; 
+               
+        // Kill the hazard when it's no longer visible 
+        hazard.checkWorldBounds = true;
+        hazard.outOfBoundsKill = true;
+    },
+    */
+
     releaseHazard: function(){
         var hazardY = 300;
          // Set the new position of the hazard
