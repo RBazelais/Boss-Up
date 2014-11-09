@@ -5,20 +5,33 @@ var game = new Phaser.Game(640, 360, Phaser.AUTO, 'gameDiv');
 var ramps;
 var hazard;
 var cursors;
-var background;
-var background_speed = 1;
-var bike_y_speed = 100;
+var background1;
+var background2;
+var world_speed = -50;
+var bike_y_speed = 150;
 var bike_x_speed = 100;
 var bike_x_max = 120;
 var TopTrack = 210;
 var BottomTrack = 330;
 var onRoad = true;
 var upramp;
-var ramp_speed = -200;
+//var ramp_speed = -200;
 var downramp;
 var fx;
 var music, bikejump;
-//var hazards;
+var hazards;
+var gameStarted = false;
+var buffer = 30;
+var maxWorldSpeed = -250;
+var minWorldSpeed = -50;
+// add ramp variable as group and launch from side of screen
+var ramps;
+var hitpoints = 3;
+var ramp_height = 135;
+var gameTimer=0;
+var nextRamp = 0;
+
+
 
 
 // Creates a new 'main' state that will contain the game
@@ -31,7 +44,7 @@ var mainState = {
         game.load.image('bike', 'assets/images/ghost_bike.png');  
 
         // Load the hazard sprites
-        game.load.image('hazard', 'assets/images/pickle_juice.png');
+        game.load.image('pickle_juice', 'assets/images/pickle_juice.png');
 
         //Load the road sprite
         game.load.image('background', 'assets/images/background.png');
@@ -48,28 +61,49 @@ var mainState = {
 
         //load bike Jump
         game.load.audio('bikejump', 'assets/audio/BIKE_Jump.ogg');
+
+        //load metal crash
+
+        //load organic crash
     },
 
     // Fuction called after 'preload' to setup the game 
     create: function() { 
+
+        //Create array of hazard sprite names
+        //NOT DONE YET CODE ME!!!!!
+        //hazards [] = ('pickle_juice', 'pickle_juice', 'pickle_juice');
+
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         cursors = game.input.keyboard.createCursorKeys();
         
         //add a tile sprite to control the background
-        background = game.add.tileSprite(0, 0, 640, 360, 'background');
-              
+        //background = game.add.tileSprite(0, 0, 640, 360, 'background');
+        background1 = game.add.sprite(0, 0, 'background');
+        game.physics.enable(background1, Phaser.Physics.ARCADE)
+
+
+        background2 = game.add.sprite(background1.body.width-buffer, 0, 'background');
+        game.physics.enable(background2, Phaser.Physics.ARCADE)
+
+        //ramps
+        ramps = game.add.group();
+            
+        //ramps.setAll('outOfBoundsKill', true);
+        //ramps.setAll('checkWorldBounds', true);
+
 
         //upramp creation
-
+        /*
         upramp = game.add.sprite(game.world.width, 135, 'upRamp');
         game.physics.enable(upramp, Phaser.Physics.ARCADE);
 
         //downramp creation
         downramp = game.add.sprite(game.world.width, 135, 'downRamp');
         game.physics.enable(downramp, Phaser.Physics.ARCADE);
-
+        */
 
         //downramp creation 
          // Display the bike on the screen
@@ -89,29 +123,33 @@ var mainState = {
         game.physics.arcade.enable(this.bike);
         this.bike.body.collideWorldBounds = true;
 
-
-        /*
-        //Create a group of 20 hazards
-        this.hazards = game.add.group();
-        this.hazards.enableBody = true;
-        this.hazards.createMultiple(20, 'hazard');  
-*/
-
-        hazard = game.add.sprite(this.game.world.width, 280, 'hazard');
+            
+        hazard = game.add.sprite(this.game.world.width, 280, 'pickle_juice');
         game.physics.enable(hazard, Phaser.Physics.ARCADE);
-        this.releaseHazard();
-        this.addRamps();
-        // Timer that calls 'addRowOfPipes' ever 1.5 seconds
-        this.timer = this.game.time.events.loop(15000, this.addRamps, this);           
-        this.timer = this.game.time.events.loop(1000, this.increaseSpeed, this);
-        this.timer = this.game.time.events.loop(1000, this.releaseHazard, this);
+        
+        //this.addRamps();
+       // this.releaseHazard();
+        //Spawn an Up Ramp
 
+        game.time.events.loop(Phaser.Timer.SECOND, this.updateCounter, this);
+
+       // game.time.events.loop(Phaser.Timer.SECOND, this.updateCounter(), this);
+        game.time.events.loop(Math.random()*10000, this.spawnRamps, this); 
+        //spawn a dwon ramp
+        //game.time.events.loop(Math.random()*10000, this.spawnRamps, this);
+       
+        //game.time.events.loop(1000, this.increaseSpeed(), this);
+        //game.time.events.loop(1000, this.releaseHazard(), this);
+        
         // Add a score label on the top left of the screen
         //this.score = 0;
         //this.labelScore = this.game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });  
     },
 
-    
+
+    updateCounter: function(){
+        gameTimer++;
+    },
 
     // This function is called 60 times per second
     update: function() {
@@ -122,26 +160,26 @@ var mainState = {
         //Move the bike with the cursors
         this.moveBike();
 
-        
-        
+
+
+             
         
         //  Scroll the background
-        background.tilePosition.x -= background_speed;
+        //background.tilePosition.x -= background_speed;
         
+        this.loopBackgrounds();
+        this.updateRamps();
         
     
         // If the bike overlap any hazards, call collisionHandler
         //game.physics.arcade.overlap(this.bike, this.hazards, hazardCollisionHandler, null, this);      
         
         // If the bike overlap any hazards, call collisionHandler
-        if(onRoad){
-            game.physics.arcade.overlap(this.bike, upramp, this.rampCollisionHandler, null, this);
-            game.physics.arcade.overlap(this.bike, downramp, this.hazardCollisionHandler, null, this);
-        }   
-        else{
-            game.physics.arcade.overlap(this.bike, downramp, this.rampCollisionHandler, null, this);
+        //if(onRoad){
+            game.physics.arcade.overlap(this.bike, ramps, this.rampCollisionHandler, null, this);
+         //game.physics.arcade.overlap(this.bike, downramp, this.hazardCollisionHandler, null, this);
+        //}   
         
-        }
 
          game.physics.arcade.overlap(this.bike, hazard, this.hazardCollisionHandler, null, this);
         
@@ -152,30 +190,127 @@ var mainState = {
         if(onRoad){
             TopTrack = 210;
             BottomTrack = 330;
+            world_speed = -200;
         }
         else{
             TopTrack = 60;
             BottomTrack = 105;
+            world_speed = -50;
         }
     },
 
-    //adds up and down ramps as time passes
-    addRamps: function(){
-        upramp.position.x = game.world.width;
-        upramp.body.velocity.x = ramp_speed;
+    //Spawn Ramps
 
+    spawnRamps: function(){
+        //Random number or nbool if possible:
+        if(nextRamp<gameTimer){
+            var isUpRamp = Math.random()<.5; // set isUpRamp to true or fals
+            /*var enemy = enemies.create(Math.random()*game.world.width, Math.random()*game.world.width, 'pigcat');
+            enemy.body.collideWorldBounds = true;
+            enemy.body.velocity.x= (Math.random()*100);
+            enemy.body.velocity.y= (Math.random()*100);
+            enemies.size++;
+            // If enemy spawns out of x bounds, move it in
+
+            enemy.body.bounce.set(1);
+            enemy.animations.add('safe', [0]);
+            enemy.animations.add('unsafe', [1,2], 6, true);
+            enemy.animations.add('wall', [2]);
+            enemy.isWall = false;
+            */
+        
+            var rampImage;
+            if(isUpRamp){
+                rampImage = 'upRamp';
+                //game.physics.enable(ramps, Phaser.Physics.ARCADE);
+            }
+            else{
+                rampImage = 'downRamp';
+                //game.physics.enable(ramps, Phaser.Physics.ARCADE);
+            }
+
+            var ramp = ramps.create(game.world.width, ramp_height, rampImage);
+            game.physics.enable(ramps, Phaser.Physics.ARCADE);
+            ramp.body.velocity.x = world_speed;
+            ramp.isUpRamp = isUpRamp;
+            nextRamp = gameTimer+6;
+        }
+
+
+        
+    },
+
+    
+
+    updateRamps: function(){
+        /*
+        enemies.forEach(function(enemy){
+                if(!enemy.isWall){
+                    enemy.animations.play('unsafe');
+                }   
+                else{
+                    enemy.animations.play('wall');
+                }
+            });
+        */
+        //var ramp;
+
+        ramps.forEach(function(ramp){
+            ramp.body.velocity.x = world_speed;
+            if(ramp.body.position.x+ramp.body.width <= 0){
+                //ramp.remove();
+            }
+         });
+
+        
+
+
+    },
+
+    setSpeed: function(){
+        this.body.velocity.x = world_speed;
+    },
+
+
+    //creates a loop of backgrounds set to the world speed
+    loopBackgrounds: function(){
+        background1.body.velocity.x = world_speed;
+        background2.body.velocity.x = world_speed;
+
+        
+        if(background1.body.width + background1.body.position.x <= 0){
+            background1.body.position.x = background2.body.width+background2.body.position.x;   
+        }
+    
+        
+        if(background2.body.width + background2.body.position.x <= 0){
+            background2.body.position.x = background1.body.width+background1.body.position.x;   
+        }
+    
+        
+    },
+
+    //adds up and down ramps as time passes
+    addUpRamp: function(){
+        upramp.position.x = game.world.width;
+        upramp.body.velocity.x = world_speed;
+    },
+
+    addDownRamp: function(){
         downramp.position.x=game.world.width+360;
-        downramp.body.velocity.x= ramp_speed;
+        downramp.body.velocity.x= world_speed;
     },
 
     increaseSpeed: function(){
-        background_speed++;
+        if(world_speed > minWorldSpeed){
+            world_speed -=25;
+        }
         //fast_music.play();
     },
 
     decreaseSpeed: function(){
-        if(background_speed>1){
-        background_speed--;
+        if(world_speed< maxWorldSpeed){
+        world_speed +=25;
         }       
         //calm_music.play();
     },
@@ -230,7 +365,7 @@ var mainState = {
 
     hazardCollisionHandler: function() {
         background_speed = 1;
-        this.bike.body.velocity.x = ramp_speed;
+        //this.bike.body.velocity.x = world_speed;
         this.releaseHazard();
     },
 
@@ -240,6 +375,7 @@ var mainState = {
         var exitY;
         if(onRoad){
             exitY = TopTrack;
+            this.increaseSpeed();
         }
         else{
             exitY = BottomTrack;
@@ -247,7 +383,7 @@ var mainState = {
         }
 
         this.bike.body.position.y = exitY;
-        this.bike.body.position.x += 180;
+        this.bike.body.position.x =0;
         bikejump.play();
         
 
@@ -272,14 +408,14 @@ var mainState = {
     */
 
     releaseHazard: function(){
-        var hazardY = 280;
+        var hazardY = 300;
          // Set the new position of the hazard
 
-         console.log("Got to release hazard")
+        
         hazard.body.position.x = this.game.world.width;
         hazard.body.position.y = hazardY;
         // Add velocity to the hazard to make it move left
-        hazard.body.velocity.x = -200; 
+        hazard.body.velocity.x = world_speed; 
 
         
     },
