@@ -2,11 +2,18 @@
 
 var game = new Phaser.Game(640, 360, Phaser.AUTO, 'gameDiv');
 
-var platforms;
+var ramps;
 
 var cursors;
 var road;
-var background_speed = -2;
+var background_speed = 2;
+var bike_y_speed = 100;
+var bike_x_speed = 100;
+var TopTrack = 180;
+var BottomTrack = 360;
+var onRoad = true;
+
+var highline;
 
 //var hazards;
 
@@ -17,21 +24,26 @@ var mainState = {
     // Function called first to load all the assets
     preload: function() { 
         // Change the background color of the game
-        game.stage.backgroundColor = '#71c5cf';
+        //game.stage.backgroundColor = '#71c5cf';
 
         // Load the bike sprite
         game.load.image('bike', 'assets/bike.png');  
 
-        // Load the hazard sprite
-        game.load.image('hazard', 'assets/hazard.png');  
+        // Load the hazard sprites
+        //game.load.image('hazard', 'assets/hazard.png');  
 
         //Load the road sprite
         game.load.image('background', 'assets/ghost_bike_street_level.png');
 
+        //load the up ramp
+        //game.load.image('upRamp', 'assest/upRamp.png');
 
+        //load the down ramp
+        //game.load.image('downRamp', 'assets/downRamp.png');
 
-        //Load the pothole sprite
-        //game.load.image('pothole', 'assets/pothole.png')
+        //load the highline track
+        game.load.image('highline', 'assets/highline.png');        
+        
     },
 
     // Fuction called after 'preload' to setup the game 
@@ -42,21 +54,20 @@ var mainState = {
         cursors = game.input.keyboard.createCursorKeys();
         
         //add a tile sprite to control the background
-        road = game.add.tileSprite(0, 0, 640, 369, 'background');
-
+        road = game.add.tileSprite(0, 0, 640, 360, 'background');
+        highline = game.add.tileSprite(0, 0, 640, 180, 'highline');
+         
          // Display the bike on the screen
-        this.bike = this.game.add.sprite(100, 245, 'bike');
+        this.bike = this.game.add.sprite(100, (TopTrack+TopTrack/2), 'bike');
         
+
+
         // Add gravity to the bike to make it fall
         game.physics.arcade.enable(this.bike);
-        this.bike.body.gravity.y = 250; 
         this.bike.body.collideWorldBounds = true;
 
 
-        // Call the 'jump' function when the spacekey is hit
-        var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        spaceKey.onDown.add(this.jump, this); 
-
+        
         // Create a group of 20 hazards
         //this.hazards = game.add.group();
         //this.hazards.enableBody = true;
@@ -74,70 +85,100 @@ var mainState = {
 
     // This function is called 60 times per second
     update: function() {
+
+        //console.log("Player x y" + this.bike.body.position.x + " " + this.bike.body.position.y);
+
+        //Check which track the player is on and update parameters accordingly
+        this.updateTracks();
+        //Move the bike with the cursors
+        this.moveBike();
+        
         
         //  Scroll the background
-        road.tilePosition.x += background_speed;
-
-        // If the bike is out of the world (too high or too low), call the 'restartGame' function
-        if (this.bike.inWorld == false){
-            this.restartGame(); 
-        }
+        road.tilePosition.x -= background_speed;
+        highline.tilePosition.x -= background_speed;
+    
+        // If the bike overlap any hazards, call collisionHandler
+        //game.physics.arcade.overlap(this.bike, this.hazards, hazardCollisionHandler, null, this);      
         
+        // If the bike overlap any hazards, call collisionHandler
+        //game.physics.arcade.overlap(this.bike, this.ramp, rampCollisionHandler, null, this);      
+    
+    },
+
+    //Set the boundaries for whatever track the player is on
+    updateTracks: function(){
+        if(onRoad){
+            TopTrack = 200;
+            BottomTrack = 280;
+        }
         else{
+            TopTrack = 100;
+            BottomTrack = 200;
+        }
+    },
+
+
+    //Moves the bike in response to the arrow keys
+    moveBike: function(){
+        
             this.bike.body.velocity.x = 0;
+            this.bike.body.velocity.y = 0;
+            
             if (cursors.left.isDown)
             {
             //  Move to the left
-            this.bike.body.velocity.x = -150;
+            this.bike.body.velocity.x = -bike_x_speed;
  
             //player.animations.play('left');
             }
-            else if (cursors.right.isDown)
+            if (cursors.right.isDown)
             {
             //  Move to the right
-            this.bike.body.velocity.x = 150;
+            this.bike.body.velocity.x = bike_x_speed;
+
  
             //player.animations.play('right');
             }
-            //  Allow the player to jump if they are touching the ground.
-            if (cursors.up.isDown && this.bike.body.position.y>400)
+            if(cursors.down.isDown && this.bike.body.position.y<BottomTrack)
             {
-                this.bike.body.velocity.y = -200;
+                this.bike.body.velocity.y = bike_y_speed;
+            }
+            //  Allow the player to move up on the screen
+            if (cursors.up.isDown && this.bike.body.position.y>TopTrack)
+            {
+                this.bike.body.velocity.y = -bike_y_speed;
         
             }
 
-    
-        // If the bike overlap any hazards, call 'restartGame'
-        game.physics.arcade.overlap(this.bike, this.hazards, this.restartGame, null, this);      
-    }
+
     },
 
-    updateBackgrounds: function(){
 
-        //console.log("Road position: " + road.body.position.x);
-        //console.log("road.position.x "+ road.position.x);
-        /*
-        if (road.body.position.x < 0){
-           road.body.position.x = 0;
-
-        }*/
-        
-        
-    },
-
-    // Make the bike jump 
-    jump: function() {
-        if(this.bike.body.position.y>400){
-        // Add a vertical velocity to the bike
-        this.bike.body.velocity.y = -300;
-    }
-    },
 
     // Restart the game
     restartGame: function() {
         // Start the 'main' state, which restarts the game
         game.state.start('main');
     },
+
+
+    //CollisionHandler
+
+    hazardCollisionHandler: function() {
+
+        //add code to BOSS UP! bike to bottom of highline
+
+        //add code to BOSS Down bike to road
+
+        //add code to change bool from onRoad to false when bike collides with highline sprite
+    },
+
+    rampCollisionHandler: function(){
+        
+
+    },
+    
 /*
     // Add a hazard on the screen
     addOneHazard: function(x, y) {
