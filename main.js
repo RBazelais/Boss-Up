@@ -13,7 +13,7 @@ var park_speed = -100;
 var bike_y_speed = 150;
 var bike_x_speed = 100;
 var bike_x_max = 120;
-var TopTrack = 60;
+var TopTrack = 30;
 var BottomTrack = 105;
 var onRoad = false;
 var upramp;
@@ -211,6 +211,7 @@ var mainState = {
         
         this.loopBackgrounds();
         this.updateRamps();
+        this.updateHazards();
         
     
         // If the bike overlap any hazards, call collisionHandler
@@ -263,15 +264,29 @@ var mainState = {
 
     },
 
+    updateHazards: function(){
+
+         hazards.forEach(function(hazard){
+            hazard.body.velocity.x = world_speed;
+            if(hazard.body.position.x+hazard.body.width <= 0){
+                //ramps.destroy();
+            }
+         });
+
+    },
+
     loseState: function() {
         // Stop timer
-        game.time.events.stop();
+        
 
         // Game over text
         introText.setText('Game Over!\nClick to try again.');
         introText.visible = true;
 
-        //bike.destroy();
+        background1.body.velocity.x =0;
+        background2.body.velocity.x =0;
+        
+        this.bike.destroy();
         hazards.destroy();
         ramps.destroy();
         
@@ -279,12 +294,15 @@ var mainState = {
         scoreText.visible = false;
         hitPointsText.visible = false;
 
+game.time.events.stop();
         
       },
     //Spawn Ramps
 
     spawnRamps: function(){
-        //Random number or nbool if possible:
+        //Random nu ramps.forEach(function(ramp){
+    
+
         if(nextRamp<gameTimer){
             var isUpRamp = Math.random()<.5; // set isUpRamp to true or fals
             /*var enemy = enemies.create(Math.random()*game.world.width, Math.random()*game.world.width, 'pigcat');
@@ -495,7 +513,7 @@ var mainState = {
                 bossUp.play();
             }
             else{
-                TopTrack = 60;
+                TopTrack = 30;
                 BottomTrack = 105;
                 world_speed = park_speed;
                 exitY= BottomTrack;
