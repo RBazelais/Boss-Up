@@ -101,8 +101,7 @@ var mainState = {
     create: function() { 
 
         //Create array of hazard sprite names
-        //NOT DONE YET CODE ME!!!!!
-         var hazards = ["firehydrant", "raccoon", "pothole", "jogger", "grandma", "rock", "pedestrians", "bush", "head out of manhole", "mailbox"];
+        var hazards = ["firehydrant", "raccoon", "pothole", "jogger", "grandma", "rock", "pedestrians", "bush", "head out of manhole", "mailbox"];
 
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -184,8 +183,10 @@ var mainState = {
 
         
         // Add a score label on the top left of the screen
-        //this.score = 0;
-        //this.labelScore = this.game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });  
+        this.score = 0;
+        this.labelScore = this.game.add.text(20, 20, scoreString, { font: "30px Arial", fill: "#ffffff" });
+        this.labelScore = this.game.add.text(20, 20, score, { font: "30px Arial", fill: "#ffffff" });  
+        
     },
 
 
@@ -201,10 +202,6 @@ var mainState = {
         
         //Move the bike with the cursors
         this.moveBike();
-        
-
-
-             
         
         //  Scroll the background
         //background.tilePosition.x -= background_speed;
