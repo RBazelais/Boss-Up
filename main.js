@@ -31,6 +31,9 @@ var ramp_height = 135;
 var gameTimer=0;
 var nextRamp = 0;
 
+//Audio Files
+var crash, park, street, bossUp;
+
 
 
 
@@ -61,6 +64,19 @@ var mainState = {
 
         //load bike Jump
         game.load.audio('bikejump', 'assets/audio/BIKE_Jump.ogg');
+
+        //var crash, park, street, bossUp;
+
+        
+
+        game.load.audio('crash', 'assets/audio/BIKE_Crash.ogg');
+        
+        game.load.audio('park', 'assets/audio/ENV_Park.ogg');
+        game.load.audio('street', 'assets/audio/ENV_Street.ogg');
+        
+        game.load.audio('bossUp', 'assets/audio/BOSSED_UP_01.ogg');
+
+
 
         //load metal crash
 
@@ -114,10 +130,16 @@ var mainState = {
         bikewind = game.add.audio('bikewind');
         bikewind.play();
 
+        
+
+        crash = game.add.audio('crash');
+        park = game.add.audio('park');
+        street = game.add.audio('street');
+        bossUp = game.add.audio('bossUp');
+        park.play();
+        
         //add bikejump noise
         bikejump = game.add.audio('bikejump');
-
-
 
         // Add world bounds collider
         game.physics.arcade.enable(this.bike);
@@ -135,11 +157,10 @@ var mainState = {
 
        // game.time.events.loop(Phaser.Timer.SECOND, this.updateCounter(), this);
         game.time.events.loop(Math.random()*10000, this.spawnRamps, this); 
-        //spawn a dwon ramp
-        //game.time.events.loop(Math.random()*10000, this.spawnRamps, this);
-       
-        //game.time.events.loop(1000, this.increaseSpeed(), this);
-        //game.time.events.loop(1000, this.releaseHazard(), this);
+        
+
+
+
         
         // Add a score label on the top left of the screen
         //this.score = 0;
@@ -191,6 +212,7 @@ var mainState = {
         
     },
 
+/*
     //Set the boundaries for whatever track the player is on
     updateTracks: function(){
         console.log("Got to updateTracks");
@@ -205,7 +227,7 @@ var mainState = {
             world_speed = -50;
         }
     },
-
+*/
     //Spawn Ramps
 
     spawnRamps: function(){
@@ -380,12 +402,12 @@ var mainState = {
         var exitY = 0;
         if(onRoad && !ramp.isUpRamp){
             hitPoints--;
-            //crash.play();
+            crash.play();
             
         }
         else if(!onRoad && ramp.isUpRamp){
             hitPoints--;
-            //crash.play();
+            crash.play();
             
         }
         else{
@@ -395,14 +417,19 @@ var mainState = {
             if(onRoad){
                 TopTrack = 210;
                 BottomTrack = 330;
-                world_speed = -200;
+                world_speed = -250;
                 exitY = TopTrack;
+                street.play();
+                park.stop();
+                bossUp.play();
             }
             else{
                 TopTrack = 60;
                 BottomTrack = 105;
                 world_speed = -50;
                 exitY= BottomTrack;
+                park.play();
+                street.stop();
             }
 
         bike.body.position.y = exitY;
@@ -411,7 +438,7 @@ var mainState = {
         }
         
         
-        console.log(" On road is " + onRoad +" Exit y:" + exitY);
+        //console.log(" On road is " + onRoad +" Exit y:" + exitY);
 
         ramp.destroy();
         
