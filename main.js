@@ -8,6 +8,8 @@ var cursors;
 var background1;
 var background2;
 var world_speed = -100;
+var street_speed = -250;
+var park_speed = -100;
 var bike_y_speed = 150;
 var bike_x_speed = 100;
 var bike_x_max = 120;
@@ -145,13 +147,20 @@ var mainState = {
         
 
         crash = game.add.audio('crash');
+        crash.volume -= .5;
+        
         park = game.add.audio('park');
+        
         street = game.add.audio('street');
+        
         bossUp = game.add.audio('bossUp');
+        bossUp.volume -= .5;
+
         park.play();
         
         //add bikejump noise
         bikejump = game.add.audio('bikejump');
+        bikejump.volume -= .5;
 
         // Add world bounds collider
         game.physics.arcade.enable(this.bike);
@@ -405,7 +414,7 @@ var mainState = {
     //CollisionHandler
 
     hazardCollisionHandler: function() {
-        background_speed = 1;
+        //background_speed = 1;
         //this.bike.body.velocity.x = world_speed;
         this.releaseHazard();
     },
@@ -414,12 +423,20 @@ var mainState = {
         var exitY = 0;
         if(onRoad && !ramp.isUpRamp){
             hitPoints--;
+            
+            world_speed = 0;
             crash.play();
+
+            var temp = setTimeout(function(){world_speed = street_speed},1000);
             
         }
         else if(!onRoad && ramp.isUpRamp){
             hitPoints--;
             crash.play();
+            world_speed = 0;
+            crash.play();
+            var temp = setTimeout(function(){world_speed = park_speed},1000);
+            
             
         }
         else{
@@ -429,7 +446,7 @@ var mainState = {
             if(onRoad){
                 TopTrack = 210;
                 BottomTrack = 330;
-                world_speed = -250;
+                world_speed = street_speed;
                 exitY = TopTrack;
                 street.play();
                 park.stop();
@@ -438,7 +455,7 @@ var mainState = {
             else{
                 TopTrack = 60;
                 BottomTrack = 105;
-                world_speed = -50;
+                world_speed = park_speed;
                 exitY= BottomTrack;
                 park.play();
                 street.stop();
