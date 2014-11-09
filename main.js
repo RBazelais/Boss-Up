@@ -60,9 +60,6 @@ var mainState = {
     // Function called first to load all the assets
     preload: function() { 
        
-        //load sprite sheet
-        game.load.spritesheet('hazardsprites','assets/hazardsprites.png', 60, 60);
-
         // Load the bike sprite
         game.load.image('bike', 'assets/images/ghost_bike.png');  
 
@@ -107,8 +104,8 @@ var mainState = {
     create: function() { 
 
         //Create array of hazard sprite names
-        var hazardNames = ["bush", "raccoon", "manhole","baracade", "mailbox", "fire hydrant", "taxi", "bus", "red car", "blue car", "black car", "truck", "jogger", "man", "woman", "grandma", "jogger", "grandma"];
-        
+        //var hazardNames = ["firehydrant", "raccoon", "pothole", "jogger", "grandma", "rock", "pedestrians", "bush", "head out of manhole", "mailbox"];
+
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -283,7 +280,7 @@ var mainState = {
         
 
         // Game over text
-        introText.setText('Game Over!\nClick to try again.');
+        introText.setText('Game Over!');
         introText.visible = true;
 
         background1.body.velocity.x =0;
@@ -296,7 +293,8 @@ var mainState = {
         // Hide score and HP
         scoreText.visible = false;
         hitPointsText.visible = false;
-        
+
+
         
       },
     //Spawn Ramps
@@ -537,6 +535,7 @@ var mainState = {
     },
     
     
+
     releaseHazard: function(){
         var hazardY = 300;
          // Set the new position of the hazard
