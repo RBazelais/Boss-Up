@@ -66,6 +66,8 @@ var mainState = {
         // Load the hazard sprites
         game.load.image('pickle_juice', 'assets/images/pickle_juice.png');
 
+        game.load.spritesheet('hazardNames', 'assets/images/hazard_sprites.png', 60, 60);
+
         //Load the road sprite
         game.load.image('background', 'assets/images/background.png');
 
@@ -104,7 +106,7 @@ var mainState = {
     create: function() { 
 
         //Create array of hazard sprite names
-        var hazardNames = ["firehydrant", "raccoon", "pothole", "jogger", "grandma", "rock", "pedestrians", "bush", "head out of manhole", "mailbox"];
+        //var hazardNames = ["firehydrant", "raccoon", "pothole", "jogger", "grandma", "rock", "pedestrians", "bush", "head out of manhole", "mailbox"];
 
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -257,7 +259,11 @@ var mainState = {
         
         for(var i = 0; i < 2; i++){
 
-        var hazard = hazards.create(game.world.width, Math.random()*game.world.height, 'pickle_juice');
+        var hazard = hazards.create(game.world.width, Math.random()*game.world.height, 'hazardNames');
+        var tempFrame = Math.round(Math.random()*8);
+        hazard.animations.add('frame', [tempFrame)]);
+        
+        hazard.animations.play('frame');
         game.physics.enable(hazards, Phaser.Physics.ARCADE);
         hazard.body.velocity.x = world_speed;
         }
@@ -294,16 +300,6 @@ var mainState = {
         scoreText.visible = false;
         hitPointsText.visible = false;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-
-
-=======
-game.time.events.stop();
->>>>>>> origin/master
-=======
->>>>>>> parent of 8ed1ab9... Fixed Sprite Order
         
       },
     //Spawn Ramps
