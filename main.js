@@ -543,24 +543,7 @@ game.time.events.stop();
 
     },
     
-    /*
-    // Add a hazard on the screen
-    addOneHazard: function(x, y) {
-        // Get the first dead hazard of our group
-        hazard = game.add.sprite('hazard');
-        game.physics.enable(hazard, Phaser.Physics.ARCADE);
-        // Set the new position of the hazard
-        hazard.reset(x, y);
-
-        // Add velocity to the hazard to make it move left
-        hazard.body.velocity.x = -200; 
-               
-        // Kill the hazard when it's no longer visible 
-        hazard.checkWorldBounds = true;
-        hazard.outOfBoundsKill = true;
-    },
-    */
-
+    
     releaseHazard: function(){
         var hazardY = 300;
          // Set the new position of the hazard
