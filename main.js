@@ -296,14 +296,7 @@ var mainState = {
         // Hide score and HP
         scoreText.visible = false;
         hitPointsText.visible = false;
-
-<<<<<<< HEAD
-
-
-
-=======
-game.time.events.stop();
->>>>>>> origin/master
+        
         
       },
     //Spawn Ramps
