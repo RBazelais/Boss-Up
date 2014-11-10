@@ -7,12 +7,23 @@ var ramps;
 var cursors;
 var background1;
 var background2;
+
+//Set speeds
 var world_speed = -100;
 var street_speed = -250;
 var park_speed = -100;
 var bike_y_speed = 150;
 var bike_x_speed = 100;
 var bike_x_max = 120;
+
+//Set Limits for hazard spawn points
+var parkTop = 30;
+var parkBottom =105;
+var streetTop = 210;
+var streetBottom = 330;
+
+
+//Set Track boundary
 var TopTrack = 30;
 var BottomTrack = 105;
 var onRoad = false;
@@ -257,9 +268,19 @@ var mainState = {
     spawnHazards: function(){
         game.physics.enable(hazards, Phaser.Physics.ARCADE);
         
+
+        var isStreetHazard = Math.random()<.5;
+        var hazardY = 0;
+
+        if(isStreetHazard){
+            hazardY = streetTop+(Math.random()*(streetBottom-streetTop));
+        }
+        else{
+            hazardY = parkTop+(Math.random()*(parkBottom-parkTop));
+        }
         
 
-        var hazard = hazards.create(game.world.width, Math.random()*game.world.height, 'hazardNames');
+        var hazard = hazards.create(game.world.width, hazardY, 'hazardNames');
         var tempFrame = Math.round(Math.random()*8);
         hazard.animations.add('frame', [tempFrame]);
         
