@@ -75,7 +75,7 @@ var mainState = {
         game.load.image('bike', 'assets/images/ghost_bike.png');  
 
         // Load the hazard sprites
-       // game.load.image('pickle_juice', 'assets/images/pickle_juice.png');
+        game.load.image('pickle_juice', 'assets/images/pickle_juice.png');
 
         game.load.spritesheet('hazardNames', 'assets/images/hazard_sprites.png', 60, 60);
 
@@ -88,7 +88,7 @@ var mainState = {
         //load the down ramp
         game.load.image('downRamp', 'assets/images/down_ramp.png');
        
-        
+
         //load background fx track
         game.load.audio('bikewind', 'assets/audio/BIKE_RideWind_Loop.ogg');
 
@@ -104,7 +104,7 @@ var mainState = {
         game.load.audio('park', 'assets/audio/ENV_Park.ogg');
         game.load.audio('street', 'assets/audio/ENV_Street.ogg');
         
-        game.load.audio('bossUp', 'assets/audio/BOSSED_UP_04.ogg');
+        game.load.audio('bossUp', 'assets/audio/BOSSED_UP_01.ogg');
 
 
 
